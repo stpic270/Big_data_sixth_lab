@@ -1,41 +1,38 @@
-import sys
-from pyspark import SparkContext
 from pyspark.sql import SparkSession
-import pandas as pd
-
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from pyspark.sql import Row
+from pyspark.sql import functions
+from pyspark.ml.linalg import Vector
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.clustering import KMeans
+from pyspark.ml.evaluation import ClusteringEvaluator
+from pyspark.ml.feature import StandardScaler
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Connect to spark
 spark = SparkSession.builder.appName("k-means").master("local[*]").getOrCreate()
+df = spark.read.csv("cleaned_OFF.csv", inferSchema=True, header=True)
 
-# Read data
-df = pd.read_csv("/home/stepka/Downloads/github/Test_folder/cleaned_OFF.csv")
+input_cols = df.columns
 
-"""
-Features have different magnitude.
-Since K-Means is a distance-based algorithm, this difference in magnitude can create a problem.
-Bring all the variables to the same magnitude with StandardScaler()
-"""
-scaled_df = StandardScaler().fit_transform(df)
+vec_assembler = VectorAssembler(inputCols=input_cols, outputCol="features")
 
-kmeans_kwargs = {
-"init": "random",
-"n_init": 10,
-"random_state": 1,
-}
+final_data = vec_assembler.transform(df)
 
-#create list to hold SSE values for each k
+scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=False)
+
+scaled_df = scaler.fit(final_data).transform(final_data)
+
 sse = []
-for k in range(1, 11):
-    kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
-    kmeans.fit(scaled_df)
-    sse.append(kmeans.inertia_)
+for k in range(2, 11):
+    kmeans = KMeans(k=k, featuresCol="scaled_features", maxIter=300)
+    model = kmeans.fit(scaled_df)
+    wsse_spark = model.summary.trainingCost
+    sse.append(wsse_spark)
 
-#visualize results to choose better cluster number using elbow method
-plt.plot(range(1, 11), sse)
-plt.xticks(range(1, 11))
+plt.plot(range(2, 11), sse)
+plt.xticks(range(2, 11))
 plt.xlabel("Number of Clusters")
 plt.ylabel("SSE")
 plt.show()
+
+plt.savefig('pyspark_sse_graph.jpg')
