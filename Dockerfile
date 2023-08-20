@@ -12,13 +12,15 @@ WORKDIR /app
 COPY . /app
 
 RUN apt-get update && \
-    apt-get install nano 
+    apt-get install nano && \
+    chmod +x scripts/scr.sh && \
+    chmod +x scripts/cassandra.sh
     
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 ARG PYSPARK_VERSION=3.2.0
 RUN pip --no-cache-dir install pyspark==${PYSPARK_VERSION}
 
-
+ENTRYPOINT ["scripts/scr.sh"]
 
     

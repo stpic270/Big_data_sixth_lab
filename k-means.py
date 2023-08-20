@@ -34,5 +34,3 @@ plt.xticks(range(2, 11))
 plt.xlabel("Number of Clusters")
 plt.ylabel("SSE")
 plt.show()
-
-plt.savefig('pyspark_sse_graph.jpg')
