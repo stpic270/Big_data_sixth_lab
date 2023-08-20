@@ -6,7 +6,7 @@
 
 Сначала table и keyspace создаются в cassandra с помощью cassandra-driver (библиотека python), это реализовано в create_table.py. Затем запускается алгоритм k-means и получает метки для набора данных (вы можете проверить файл use_cassandra.py). Наконец, метки с начальными features передаются в cassandra. Вы также можете проверить последовательность действий в scripts/cassandra.sh
 
-1) Сначала используйте эту команду, чтобы dwonload проект:
+1) После клонирования репо cначала используйте эту команду, чтобы скачать проект:
 ### docker compose build && docker compose up —no-start
 2) Затем запустите контейнер с cassandra:
 ### docker start big_data_sixth_lab-cassandra-1
