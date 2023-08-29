@@ -13,6 +13,6 @@
 3) Передать ip cassandra в volume проекта:
 ### docker exec -t big_data_sixth_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
 4) Запустить контейнер с моделью:
-### sudo docker start big_data_sixth_lab-model-1
+### docker start big_data_sixth_lab-model-1
 5) Запустите файл cassandra.sh (Cоздает keyspace и table. Также передает данные в cassandra):
 ### docker exec -t big_data_sixth_lab-model-1 bash -c "scripts/cassandra.sh"
